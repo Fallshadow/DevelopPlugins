@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+﻿// Copyright Epic Games, Inc. All Rights Reserved.
 
 using UnrealBuildTool;
 
@@ -11,15 +11,16 @@ public class FBXImporterUtilPlugin : ModuleRules
 		PublicIncludePaths.AddRange(
 			new string[] {
 				// ... add public include paths required here ...
+
 			}
-			);
+		);
 				
 		
 		PrivateIncludePaths.AddRange(
 			new string[] {
 				// ... add other private include paths required here ...
 			}
-			);
+		);
 			
 		
 		PublicDependencyModuleNames.AddRange(
@@ -27,20 +28,21 @@ public class FBXImporterUtilPlugin : ModuleRules
 			{
 				"Core",
 				// ... add other public dependencies that you statically link with here ...
-			}
-			);
+				"CoreUObject",
+                "Engine",
+            }
+		);
 			
 		
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"CoreUObject",
-				"Engine",
 				//"Slate",
 				//"SlateCore",
 				// ... add private dependencies that you statically link with here ...	
+                "FBX",  // 关键：启用 FBX SDK 模块
 			}
-			);
+		);
 		
 		
 		DynamicallyLoadedModuleNames.AddRange(
