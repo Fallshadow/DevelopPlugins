@@ -1,9 +1,9 @@
 #include "FBXParserLibrary.h"
 
 // 全局静态变量：存储复用的 FBX 管理器（防止重复调用创建多个实例）
-static FbxManager* GFBXManagerInstance = nullptr;
+FbxManager* UFBXParserLibrary::GFBXManagerInstance = nullptr;
 
-static FbxManager* CreateFBXManager() {
+FbxManager* UFBXParserLibrary::CreateFBXManager() {
     // 1. 解决重复调用问题：先检查是否已创建，已创建则直接返回
     if (GFBXManagerInstance) {
         return GFBXManagerInstance;
@@ -32,7 +32,7 @@ static FbxManager* CreateFBXManager() {
     return FBXManager;
 }
 
-static void DestroyFBXManager()
+void UFBXParserLibrary::DestroyFBXManager()
 {
     if (GFBXManagerInstance) {
         // FBX SDK 父子对象机制：销毁管理器会自动销毁其创建的 IOSettings
