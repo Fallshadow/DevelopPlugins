@@ -124,14 +124,14 @@ FParsedMeshData UFBXParserLibrary::ParseSingleFBXMeshes(FbxNode* FBXNode) {
     // 循环遍历每个 FBX 顶点，核心是坐标系转换
     // FBX 坐标系：Y 轴向上（X: 右，Y: 上，Z: 前）；
     // UE 坐标系：Z 轴向上（X: 右，Y: 前，Z: 上）；
-    // TODO：这里先不改变顺序试试
+    // END：这里先不改变顺序试试  其实就还是需要调换
     for (int32 v = 0; v < VertexCount; v++) {
         FVector UEVertex(
             FBXVertices[v].mData[0],
-            /*FBXVertices[v].mData[2],
-            FBXVertices[v].mData[1]*/
-            FBXVertices[v].mData[1],
-            FBXVertices[v].mData[2]
+            FBXVertices[v].mData[2],
+            FBXVertices[v].mData[1]
+            //FBXVertices[v].mData[1],
+            //FBXVertices[v].mData[2]
         );
         ParsedData.Vertices.Add(UEVertex);
     }
