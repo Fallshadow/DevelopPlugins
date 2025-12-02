@@ -23,6 +23,46 @@ struct FParsedMeshData {
     // 网格名称（FBX 中的节点名称）
     UPROPERTY(BlueprintReadWrite, Category = "FBX Parser")
     FString MeshName;
+
+    // 插件 TODO: 在下面填写自定义属性
+
+    // 跑道名称（TODO：FBX 中是 string 类型，是否需要变成 int）
+    UPROPERTY(BlueprintReadWrite, Category = "FBX Parser")
+    FString RwyNum;
+
+    // 灯光类型
+    UPROPERTY(BlueprintReadWrite, Category = "FBX Parser")
+    int LightType;
+
+    // VerticalAngle 和 HorizontalAngle
+    UPROPERTY(BlueprintReadWrite, Category = "FBX Parser")
+    FVector2D Angle;
+
+    // 灯光方向类型
+    UPROPERTY(BlueprintReadWrite, Category = "FBX Parser")
+    int Directional;
+
+    // 闪烁频率
+    UPROPERTY(BlueprintReadWrite, Category = "FBX Parser")
+    int Freq;
+
+    void PrintCustomPropsOnly() const
+    {
+        FString CustomStr = FString::Printf(
+            TEXT("=== 网格【%s】自定义属性 ===\n")
+            TEXT("跑道号：%s | 灯光类型：%d\n")
+            TEXT("垂直角度：%.2f | 水平角度：%.2f\n")
+            TEXT("灯光方向类型：%d | 闪烁频率：%d"),
+            *MeshName,
+            *RwyNum,
+            LightType,
+            Angle.Y,
+            Angle.X,
+            Directional,
+            Freq
+        );
+        UE_LOG(LogTemp, Warning, TEXT("%s"), *CustomStr); // Warning级别，日志中更醒目
+    }
 };
 
 UCLASS()

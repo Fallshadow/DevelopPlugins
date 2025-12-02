@@ -55,6 +55,8 @@ void AFBXParseActor::BeginPlay()
                     TriIndex / 3, Index1, Index2, Index3);
             }
         }
+
+        MeshData.PrintCustomPropsOnly();
     }
 
     UE_LOG(LogTemp, Log, TEXT("===== FBX解析结果遍历完成 ====="));

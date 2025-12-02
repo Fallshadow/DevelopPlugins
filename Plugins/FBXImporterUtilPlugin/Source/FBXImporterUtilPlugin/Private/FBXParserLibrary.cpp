@@ -3,8 +3,6 @@
 // 全局静态变量：存储复用的 FBX 管理器（防止重复调用创建多个实例）
 FbxManager* UFBXParserLibrary::GFBXManagerInstance = nullptr;
 
-
-
 FbxManager* UFBXParserLibrary::CreateFBXManager() {
     // 1. 解决重复调用问题：先检查是否已创建，已创建则直接返回
     if (GFBXManagerInstance) {
@@ -42,6 +40,42 @@ void UFBXParserLibrary::DestroyFBXManager()
         // 重置全局变量，避免野指针
         GFBXManagerInstance = nullptr;
         UE_LOG(LogTemp, Log, TEXT("FBX Manager destroyed successfully!"));
+    }
+}
+
+// 解析单个FBX Node的自定义属性
+static void ParseFbxNodeProperties(FbxNode* Node, FParsedMeshData& OutProps)
+{
+    if (!Node) return;
+
+    FbxProperty UserProperties = Node->GetFirstProperty();
+    while (UserProperties.IsValid()) {
+        FString PropName = UTF8_TO_TCHAR(UserProperties.GetName());
+        FbxDataType PropType = UserProperties.GetPropertyDataType();
+
+        // 插件 TODO：在下面解析自定义属性
+        if (PropName == TEXT("RwyNum")) {
+            FbxString tempFBXStr = UserProperties.Get<FbxString>();
+            OutProps.RwyNum = FUTF8ToTCHAR(tempFBXStr.Buffer());
+        }
+        else if (PropName == TEXT("LightType")) {
+            OutProps.LightType = UserProperties.Get<int>();
+        }
+        else if (PropName == TEXT("VerticalAngle")) {
+            OutProps.Angle.X = UserProperties.Get<float>();
+        }
+        else if (PropName == TEXT("HorizontalAngle")) {
+            OutProps.Angle.Y = UserProperties.Get<float>();
+        }
+        else if (PropName == TEXT("Directional")) {
+            OutProps.Directional = UserProperties.Get<int>();
+        }
+        else if (PropName == TEXT("Freq")) {
+            OutProps.Freq = UserProperties.Get<int>();
+        }
+
+        // 下一个属性
+        UserProperties = Node->GetNextProperty(UserProperties);
     }
 }
 
@@ -146,6 +180,8 @@ FParsedMeshData UFBXParserLibrary::ParseSingleFBXMeshes(FbxNode* FBXNode) {
             ParsedData.Triangles.Add(FBXMesh->GetPolygonVertex(polyIndex, polyVertexIndex));
         }
     }
+
+    ParseFbxNodeProperties(FBXNode, ParsedData);
 
     UE_LOG(LogTemp, Log, TEXT("Parsed mesh: %s | Vertices: %d"), *ParsedData.MeshName, ParsedData.Vertices.Num());
     return ParsedData;
