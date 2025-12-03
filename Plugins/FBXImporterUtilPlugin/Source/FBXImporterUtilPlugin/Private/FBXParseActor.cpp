@@ -60,6 +60,8 @@ void AFBXParseActor::BeginPlay()
     }
 
     UE_LOG(LogTemp, Log, TEXT("===== FBX解析结果遍历完成 ====="));
+
+    UFBXParserLibrary::WriteFBXDataToJSON(meshArray, ExportFBXJsonName);
 }
 
 // Called every frame

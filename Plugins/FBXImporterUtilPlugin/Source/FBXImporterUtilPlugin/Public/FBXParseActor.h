@@ -25,5 +25,8 @@ protected:
 
 public:	
 	UPROPERTY(EditAnywhere)
-	FString FBXPath;
+	FString FBXPath;	
+	
+	UPROPERTY(EditAnywhere)
+	FString ExportFBXJsonName;
 };

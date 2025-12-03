@@ -43,6 +43,24 @@ void UFBXParserLibrary::DestroyFBXManager()
     }
 }
 
+// 辅助函数：创建保存目录（项目/Saved/FBXVertexConfigs/）
+bool UFBXParserLibrary::CreateSaveDirectory(FString& OutSavePath)
+{
+    // 配置文件保存路径：项目/Saved/FBXVertexConfigs/
+    OutSavePath = FPaths::ProjectSavedDir() + TEXT("FBXDataConfigs/");
+
+    // 若目录不存在，创建目录
+    if (!FPaths::DirectoryExists(OutSavePath)) {
+        bool bCreated = IFileManager::Get().MakeDirectory(*OutSavePath, true);
+        if (!bCreated) {
+            UE_LOG(LogTemp, Error, TEXT("Failed to create save directory: %s"), *OutSavePath);
+            return false;
+        }
+        UE_LOG(LogTemp, Log, TEXT("Created save directory: %s"), *OutSavePath);
+    }
+    return true;
+}
+
 // 解析单个FBX Node的自定义属性
 static void ParseFbxNodeProperties(FbxNode* Node, FParsedMeshData& OutProps)
 {
@@ -185,4 +203,83 @@ FParsedMeshData UFBXParserLibrary::ParseSingleFBXMeshes(FbxNode* FBXNode) {
 
     UE_LOG(LogTemp, Log, TEXT("Parsed mesh: %s | Vertices: %d"), *ParsedData.MeshName, ParsedData.Vertices.Num());
     return ParsedData;
+}
+
+// 写入 JSON 配置文件
+bool UFBXParserLibrary::WriteFBXDataToJSON(const TArray<FParsedMeshData>& ParsedMeshData, const FString& ConfigFileName)
+{
+    // 1. 检查输入数据是否有效
+    if (ParsedMeshData.Num() == 0) {
+        UE_LOG(LogTemp, Error, TEXT("No parsed mesh data to write!"));
+        return false;
+    }
+
+    // 2. 创建保存目录，获取最终文件路径
+    FString SaveDir;
+    if (!CreateSaveDirectory(SaveDir)) {
+        return false;
+    }
+    FString FinalFilePath = SaveDir + ConfigFileName + TEXT(".json");  // 完整路径：Saved/FBXVertexConfigs/xxx.json
+
+    // 3. 构建 JSON 数据结构
+    TSharedPtr<FJsonObject> RootObj = MakeShareable(new FJsonObject());
+
+    // 3.1 添加文件信息（可选，方便识别）
+    RootObj->SetNumberField(TEXT("Mesh_Count"), ParsedMeshData.Num());
+    RootObj->SetStringField(TEXT("Export_Time"), FDateTime::Now().ToString());  // 导出时间
+
+    // 3.2 遍历每个网格，添加顶点数据
+    TArray<TSharedPtr<FJsonValue>> MeshArray;
+    for (const FParsedMeshData& MeshData : ParsedMeshData) {
+        TSharedPtr<FJsonObject> MeshObj = MakeShareable(new FJsonObject());
+        MeshObj->SetStringField(TEXT("Mesh_Name"), MeshData.MeshName);  // 网格名称
+        MeshObj->SetNumberField(TEXT("Vertex_Count"), MeshData.Vertices.Num());  // 顶点数量
+
+        // 格式化顶点数据：将 FVector 转为 "X,Y,Z" 字符串数组
+        TArray<TSharedPtr<FJsonValue>> VertexArray;
+        for (const FVector& Vertex : MeshData.Vertices) {
+            // 保留 6 位小数（可调整，减少文件大小）
+            FString VertexStr = FString::Printf(TEXT("%.f,%.f,%.f"), Vertex.X, Vertex.Y, Vertex.Z);
+            VertexArray.Add(MakeShareable(new FJsonValueString(VertexStr)));
+        }
+        MeshObj->SetArrayField(TEXT("Vertices"), VertexArray);
+
+        // （可选）添加三角面索引数据
+        TArray<TSharedPtr<FJsonValue>> TriangleArray;
+        for (int32 TriangleIdx : MeshData.Triangles) {
+            TriangleArray.Add(MakeShareable(new FJsonValueNumber(TriangleIdx)));
+        }
+        MeshObj->SetArrayField(TEXT("Triangles"), TriangleArray);
+
+        // TODO: 自定义属性解析
+        MeshObj->SetStringField(TEXT("RwyNum"), MeshData.RwyNum);
+        MeshObj->SetNumberField(TEXT("LightType"), MeshData.LightType);
+        MeshObj->SetNumberField(TEXT("VerticalAngle"), MeshData.Angle.X);
+        MeshObj->SetNumberField(TEXT("HorizontalAngle"), MeshData.Angle.Y);
+        MeshObj->SetNumberField(TEXT("Directional"), MeshData.Directional);
+        MeshObj->SetNumberField(TEXT("Freq"), MeshData.Freq);
+
+        MeshArray.Add(MakeShareable(new FJsonValueObject(MeshObj)));
+    }
+    RootObj->SetArrayField(TEXT("Meshes"), MeshArray);
+
+    // 4. 将 JSON 转为字符串并写入文件
+    FString JsonStr;
+    TSharedRef<TJsonWriter<>> JsonWriter = TJsonWriterFactory<>::Create(&JsonStr, 0);  // 0 = 无缩进，4 = 带缩进（可读性强）
+    if (FJsonSerializer::Serialize(RootObj.ToSharedRef(), JsonWriter)) {
+        // 写入文件（覆盖已存在的文件）
+        bool bWriteSuccess = FFileHelper::SaveStringToFile(JsonStr, *FinalFilePath);
+        if (bWriteSuccess) {
+            UE_LOG(LogTemp, Log, TEXT("Successfully wrote vertex data to JSON: %s"), *FinalFilePath);
+            return true;
+        }
+        else {
+            UE_LOG(LogTemp, Error, TEXT("Failed to write JSON file: %s"), *FinalFilePath);
+            return false;
+        }
+    }
+    else {
+        UE_LOG(LogTemp, Error, TEXT("Failed to serialize JSON data!"));
+        return false;
+    }
 }

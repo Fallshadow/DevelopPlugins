@@ -71,7 +71,11 @@ class FBXIMPORTERUTILPLUGIN_API UFBXParserLibrary : public UBlueprintFunctionLib
 	GENERATED_BODY()
 
 public:
+    UFUNCTION(BlueprintCallable, Category = "FBX Parser", meta = (DisplayName = "Parse FBX File"))
     static TArray<FParsedMeshData> ParseFBXFile(const FString& FBXFilePath);
+
+    UFUNCTION(BlueprintCallable, Category = "FBX Parser", meta = (DisplayName = "Write FBX Data to JSON"))
+    static bool WriteFBXDataToJSON(const TArray<FParsedMeshData>& ParsedMeshData, const FString& ConfigFileName = TEXT("FBX_Config"));
 
 private:
 	static  FbxManager* CreateFBXManager();
@@ -82,5 +86,6 @@ private:
 	// 从单个 FBX 节点中提取网格数据（顶点、三角面索引），并将 FBX 坐标系转换为 UE 坐标系，最终返回封装好的网格数据结构体
     static FParsedMeshData ParseSingleFBXMeshes(FbxNode* FBXNode);
 
-
+    // 辅助函数：创建保存目录（若不存在）
+    static bool CreateSaveDirectory(FString& OutSavePath);
 };
