@@ -188,6 +188,19 @@ FParsedMeshData UFBXParserLibrary::ParseSingleFBXMeshes(FbxNode* FBXNode) {
         ParsedData.Vertices.Add(UEVertex);
     }
 
+    // 求出具体位置
+    int centerPointCount = VertexCount / 3;
+    ParsedData.CenterPoints.Reserve(centerPointCount);
+    for (int32 pdv = 0; pdv < centerPointCount; pdv++) {
+        int verticesIndex = pdv * 3;
+
+        FVector P0 = ParsedData.Vertices[verticesIndex];
+        FVector P1 = ParsedData.Vertices[verticesIndex + 1];
+        FVector P2 = ParsedData.Vertices[verticesIndex + 2];
+        FVector Center = (P0 + P1 + P2) / 3.0;
+        ParsedData.CenterPoints.Add(Center);
+    }
+
     // 解析三角面（可选，若不需要索引可删除）
     // 获取 FBX 网格的 “面总数”（FBX 中 Polygon 可以是三角面、四边形等）
     int32 PolygonCount = FBXMesh->GetPolygonCount();
@@ -238,11 +251,18 @@ bool UFBXParserLibrary::WriteFBXDataToJSON(const TArray<FParsedMeshData>& Parsed
         // 格式化顶点数据：将 FVector 转为 "X,Y,Z" 字符串数组
         TArray<TSharedPtr<FJsonValue>> VertexArray;
         for (const FVector& Vertex : MeshData.Vertices) {
-            // 保留 6 位小数（可调整，减少文件大小）
             FString VertexStr = FString::Printf(TEXT("%.f,%.f,%.f"), Vertex.X, Vertex.Y, Vertex.Z);
             VertexArray.Add(MakeShareable(new FJsonValueString(VertexStr)));
         }
         MeshObj->SetArrayField(TEXT("Vertices"), VertexArray);
+
+        // 格式化中心点数据：
+        TArray<TSharedPtr<FJsonValue>> CenterPointArray;
+        for (const FVector& Vertex : MeshData.CenterPoints) {
+            FString VertexStr = FString::Printf(TEXT("%.f,%.f,%.f"), Vertex.X, Vertex.Y, Vertex.Z);
+            CenterPointArray.Add(MakeShareable(new FJsonValueString(VertexStr)));
+        }
+        MeshObj->SetArrayField(TEXT("Center_Vertices"), CenterPointArray);
 
         // （可选）添加三角面索引数据
         TArray<TSharedPtr<FJsonValue>> TriangleArray;

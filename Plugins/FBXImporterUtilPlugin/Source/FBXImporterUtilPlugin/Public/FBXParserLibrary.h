@@ -16,6 +16,10 @@ struct FParsedMeshData {
     UPROPERTY(BlueprintReadWrite, Category = "FBX Parser")
     TArray<FVector> Vertices;
 
+    // 位置数组（每个 Mesh 的中心点，作为新生成面片的位置）
+    UPROPERTY(BlueprintReadWrite, Category = "FBX Parser")
+    TArray<FVector> CenterPoints;
+
     // 三角面索引数组（每 3 个元素组成一个三角面）
     UPROPERTY(BlueprintReadWrite, Category = "FBX Parser")
     TArray<int32> Triangles;
