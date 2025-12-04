@@ -42,7 +42,6 @@ public class FBXImporterUtilPlugin : ModuleRules
 				// ... add private dependencies that you statically link with here ...	
                 "FBX",  // 关键：启用 FBX SDK 模块
 				"Json",
-				"RawMesh",
             }
 		);
 		
