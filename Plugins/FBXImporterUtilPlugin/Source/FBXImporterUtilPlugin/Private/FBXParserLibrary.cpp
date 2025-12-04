@@ -251,7 +251,7 @@ bool UFBXParserLibrary::WriteFBXDataToJSON(const TArray<FParsedMeshData>& Parsed
         // 格式化顶点数据：将 FVector 转为 "X,Y,Z" 字符串数组
         TArray<TSharedPtr<FJsonValue>> VertexArray;
         for (const FVector& Vertex : MeshData.Vertices) {
-            FString VertexStr = FString::Printf(TEXT("%.10f,%.10f,%.10f"), Vertex.X, Vertex.Y, Vertex.Z);
+            FString VertexStr = FString::Printf(TEXT("%.10g,%.10g,%.10g"), Vertex.X, Vertex.Y, Vertex.Z);
             VertexArray.Add(MakeShareable(new FJsonValueString(VertexStr)));
         }
         MeshObj->SetArrayField(TEXT("Vertices"), VertexArray);
@@ -259,7 +259,7 @@ bool UFBXParserLibrary::WriteFBXDataToJSON(const TArray<FParsedMeshData>& Parsed
         // 格式化中心点数据：
         TArray<TSharedPtr<FJsonValue>> CenterPointArray;
         for (const FVector& Vertex : MeshData.CenterPoints) {
-            FString VertexStr = FString::Printf(TEXT("%.10f,%.10f,%.10f"), Vertex.X, Vertex.Y, Vertex.Z);
+            FString VertexStr = FString::Printf(TEXT("%.10g,%.10g,%.10g"), Vertex.X, Vertex.Y, Vertex.Z);
             CenterPointArray.Add(MakeShareable(new FJsonValueString(VertexStr)));
         }
         MeshObj->SetArrayField(TEXT("Center_Vertices"), CenterPointArray);
