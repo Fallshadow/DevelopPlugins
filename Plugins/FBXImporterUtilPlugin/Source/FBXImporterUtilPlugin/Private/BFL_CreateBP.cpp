@@ -16,7 +16,6 @@
 #include "Engine/SimpleConstructionScript.h"
 #include "Engine/SCS_Node.h"
 #include "FBXParserLibrary.h"
-#include "FBXParseActor.generated.h"
 #include "Editor.h"
 
 #endif // WITH_EDITOR
