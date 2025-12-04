@@ -44,9 +44,19 @@ public class FBXImporterUtilPlugin : ModuleRules
 				"Json",
             }
 		);
-		
-		
-		DynamicallyLoadedModuleNames.AddRange(
+
+        if (Target.bBuildEditor) {
+            PrivateDependencyModuleNames.AddRange(new string[]
+            {
+				"UnrealEd",
+				"Kismet",
+				"KismetCompiler",
+				"AssetRegistry"
+            });
+        }
+
+
+        DynamicallyLoadedModuleNames.AddRange(
 			new string[]
 			{
 				// ... add any modules that your module loads dynamically here ...
