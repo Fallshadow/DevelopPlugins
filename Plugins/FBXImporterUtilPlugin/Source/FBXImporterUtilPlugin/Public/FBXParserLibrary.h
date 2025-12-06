@@ -36,19 +36,19 @@ struct FParsedMeshData {
 
     // 灯光类型
     UPROPERTY(BlueprintReadWrite, Category = "FBX Parser")
-    int LightType;
+    int LightType = 0;
 
     // VerticalAngle 和 HorizontalAngle
     UPROPERTY(BlueprintReadWrite, Category = "FBX Parser")
-    FVector2D Angle;
+    FVector2D Angle = FVector2D::ZeroVector;
 
     // 灯光方向类型
     UPROPERTY(BlueprintReadWrite, Category = "FBX Parser")
-    int Directional;
+    int Directional = 0;
 
     // 闪烁频率
     UPROPERTY(BlueprintReadWrite, Category = "FBX Parser")
-    int Freq;
+    int Freq = 0;
 
     void PrintCustomPropsOnly() const
     {

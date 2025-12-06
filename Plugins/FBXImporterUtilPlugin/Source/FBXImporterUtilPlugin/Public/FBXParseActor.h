@@ -25,9 +25,9 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "FBX Parser")
 	FString FBXPath;	
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "FBX Parser")
 	FString ExportFBXJsonName;
 };

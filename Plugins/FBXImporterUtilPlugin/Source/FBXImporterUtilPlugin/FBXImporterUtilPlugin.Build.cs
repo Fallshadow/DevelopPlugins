@@ -30,6 +30,8 @@ public class FBXImporterUtilPlugin : ModuleRules
 				// ... add other public dependencies that you statically link with here ...
 				"CoreUObject",
                 "Engine",
+                "Json",
+                "JsonUtilities"
             }
 		);
 			
@@ -41,7 +43,6 @@ public class FBXImporterUtilPlugin : ModuleRules
 				//"SlateCore",
 				// ... add private dependencies that you statically link with here ...	
                 "FBX",  // 关键：启用 FBX SDK 模块
-				"Json",
             }
 		);
 

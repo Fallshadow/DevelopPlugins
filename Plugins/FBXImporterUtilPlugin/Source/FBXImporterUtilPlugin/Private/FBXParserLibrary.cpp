@@ -1,5 +1,15 @@
 #include "FBXParserLibrary.h"
 
+// 路径和文件操作功能
+#include "Misc/Paths.h"
+#include "HAL/FileManager.h"
+#include "Misc/FileHelper.h"
+
+// JSON 序列化支持
+#include "Dom/JsonObject.h"
+#include "Serialization/JsonWriter.h"
+#include "Serialization/JsonSerializer.h"
+
 // 全局静态变量：存储复用的 FBX 管理器（防止重复调用创建多个实例）
 FbxManager* UFBXParserLibrary::GFBXManagerInstance = nullptr;
 
